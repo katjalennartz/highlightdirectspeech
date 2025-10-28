@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.6"
+ * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.8
  */
 
 if (!defined("IN_MYBB")) {
@@ -11,14 +11,13 @@ if (!defined("IN_MYBB")) {
 //error_reporting ( -1 );
 //ini_set ( 'display_errors', true ); 
 
-
 function highlightdirectspeech_info()
 {
 	global $lang;
 
 	return array(
-		'name'			=> 'Direkte Rede hervorheben',
-		'description'	=> 'Dieses Plugin ermöglicht es direkte Rede in Posts hervorzuheben. Entweder im Showthread automatisch, per Button, oder gar nicht. Dabei kann der Nutzer seine Präferenz im UserCP einstellen. Zusätzlich kann vom Admin aktiviert werden, dass schon beim Antoworten/Thread erstellen ein Tag der Wahl (z.B. &lt;b&gt; oder auch &lt;span style="..."&gt;) um die direkte Rede gesetzt wird.',
+		'name'			=> 'Wörtliche Rede hervorheben',
+		'description'	=> 'Dieses Plugin ermöglicht es wörtliche Rede in Posts hervorzuheben. Entweder im Showthread automatisch, per Button, oder gar nicht. Dabei kann der Nutzer seine Präferenz im UserCP einstellen. Zusätzlich kann vom Admin aktiviert werden, dass schon beim Antoworten/Thread erstellen ein Tag der Wahl (z.B. &lt;b&gt; oder auch &lt;span style="..."&gt;) um die wörtliche Rede gesetzt wird.',
 		'website'		=> 'https://github.com/katjalennartz/highlightdirectspeech',
 		'author'		=> 'Risuena',
 		'authorsite'	=> 'https://github.com/katjalennartz',
@@ -96,7 +95,7 @@ function highlightdirectspeech_add_settings($type = "install")
 						//wir wollen nicht den zuvor gespeicherten wert ändern, deswegen löschen wir den value vor dem update raus.
 						unset($setting['value']);
 						$db->update_query('settings', $setting, "name='{$name}'");
-						echo "Direkte Rede: Setting: {$name} wurde aktualisiert.<br>";
+						echo "Wörtliche Rede: Setting: {$name} wurde aktualisiert.<br>";
 					}
 				}
 			}
@@ -114,21 +113,24 @@ function highlightdirectspeech_settingarray()
 		'title' => 'Hervorhebungsmodus',
 		'description' => 'Soll das Hervorheben in der Showthread (nur über JS) erfolgen, je nach Einstellung des Users oder soll es beim Erstellen des Posts/Threads direkt in die Textarea eingefügt werden?',
 		'optionscode' => "radio\nshowthread=Showthread\nnewthread=Beim Erstellen",
-		'value' => 'showthread'
+		'value' => 'showthread',
+		'disporder' => 0
 	);
 
 	$settingarray['highlightdirectspeech_foren'] = array(
 		'title' => 'Berücksichtige Foren',
-		'description' => 'Wähle die Foren aus, in denen die Hervorhebung der direkten Rede aktiviert sein soll.',
+		'description' => 'Wähle die Foren aus, in denen die Hervorhebung der wörtlichen Rede aktiviert sein soll.',
 		'optionscode' => 'forumselect',
-		'value' => '0', // Default
+		'value' => '0', // Default,
+		'disporder' => 2
 	);
 
 	$settingarray['highlightdirectspeech_css'] = array(
 		'title' => 'CSS für Hervorhebung',
-		'description' => 'Gib hier das CSS an, welches für die Hervorhebung der direkten Rede verwendet werden soll. Standard ist "font-weight: 900;"',
-		'optionscode' => 'text',
-		'value' => 'font-weight: 900;'
+		'description' => 'Gib hier das CSS an, welches für die Hervorhebung der wörtlichen Rede verwendet werden soll. Standard ist "font-weight: 900;"',
+		'optionscode' => 'textarea',
+		'value' => 'font-weight: 900;',
+		'disporder' => 3
 	);
 
 	return $settingarray;
@@ -140,7 +142,7 @@ function highlightdirectspeech_add_templates($type = "install")
 	if ($type == 'install') {
 		$templategrouparray = array(
 			'prefix' => 'highlightdirectspeech',
-			'title'  => $db->escape_string('Direkte Rede'),
+			'title'  => $db->escape_string('Wörtliche Rede'),
 			'isdefault' => 1
 		);
 		$db->insert_query("templategroups", $templategrouparray);
@@ -152,7 +154,7 @@ function highlightdirectspeech_add_templates($type = "install")
 		if ($check == 0) {
 			$db->insert_query("templates", $row);
 			if ($type == 'update') {
-				echo "Direkte Rede: Neues Template {$row['title']} wurde hinzugefügt.<br>";
+				echo "Wörtliche Rede: Neues Template {$row['title']} wurde hinzugefügt.<br>";
 			}
 		}
 	}
@@ -183,7 +185,7 @@ function highlightdirectspeech_templates()
 	});
 </script>'),
 		'version' => 1,
-		'sid' => -1,
+		'sid' => -2,
 		'dateline' => TIME_NOW
 	);
 
@@ -202,7 +204,7 @@ function highlightdirectspeech_templates()
 			});
 </script>'),
 		'version' => 1,
-		'sid' => -1,
+		'sid' => -2,
 		'dateline' => TIME_NOW
 	);
 
@@ -210,18 +212,18 @@ function highlightdirectspeech_templates()
 		'title' => 'highlightdirectspeech_showthread_button',
 		'template' => $db->escape_string('<a class="highlightbutton bl-btn bl-btn--showthread" href=""><span class="highlightcaption">Highlight "abc"</span></a>'),
 		'version' => 1,
-		'sid' => -1,
+		'sid' => -2,
 		'dateline' => TIME_NOW
 	);
 
 	$template[] = array(
 		'title' => 'highlightdirectspeech_post',
-		'template' => $db->escape_string('<tr><td><label for="tagInput">HTML-Tag für wörtliche Rede:</label></td>
-	<td>
+		'template' => $db->escape_string('<tr><td class="trow1"><label for="tagInput">HTML-Tag für wörtliche Rede:</label></td>
+	<td class="trow1">
 <input id="tagInput" type="text" style="width:300px;" placeholder="<b> oder z.B. <span style=\'color:red;\'>">
 <button type="button" id="convert">Wörtliche Rede formatieren</button></td></tr>'),
 		'version' => 1,
-		'sid' => -1,
+		'sid' => -2,
 		'dateline' => TIME_NOW
 	);
 
@@ -229,10 +231,10 @@ function highlightdirectspeech_templates()
 		'title' => 'highlightdirectspeech_ucp',
 		'template' => '
 		<fieldset class="trow2">
-		<legend><strong>Direkte Rede in Posts</strong></legend>
+		<legend><strong>Wörtliche Rede in Posts</strong></legend>
 		<table cellspacing="0" cellpadding="{$theme[\\\'tablespace\\\']}">
 		<tr>
-		<td colspan="2"><span class="smalltext"><strong>Möchtest du direkte Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</strong></span></td>
+		<td colspan="2"><span class="smalltext"><strong>Möchtest du wörtliche Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</strong></span></td>
 		</tr>
 			<tr>
 			<td colspan="2">
@@ -247,7 +249,7 @@ function highlightdirectspeech_templates()
 		</fieldset>
 		',
 		'version' => 1,
-		'sid' => -1,
+		'sid' => -2,
 		'dateline' => TIME_NOW
 	);
 	return $template;
@@ -259,12 +261,12 @@ function highlightdirectspeech_uninstall()
 	if ($db->field_exists("directspeach", "users")) {
 		$db->write_query("ALTER TABLE " . TABLE_PREFIX . "users DROP directspeach");
 	}
-
-	//remove variables
-	include MYBB_ROOT . "/inc/adminfunctions_templates.php";
-
+	// Einstellungen entfernen
+	$db->delete_query("settings", "name LIKE 'highlightdirectspeech%'");
+	$db->delete_query('settinggroups', "name = 'highlightdirectspeech'");
 
 	$db->delete_query('templates', "title like 'highlightdirectspeech%'");
+	$db->delete_query("templategroups", "prefix = 'highlightdirectspeech'");
 }
 
 function highlightdirectspeech_activate()
