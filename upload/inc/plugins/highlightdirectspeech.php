@@ -172,7 +172,7 @@ function highlightdirectspeech_templates()
 		'title' => 'highlightdirectspeech_showthread_js',
 		'template' => $db->escape_string('
 		<style>
-		span.highlight-speach {
+		span.directspeech {
 			{$css}
 		}
 	</style>
@@ -195,7 +195,7 @@ function highlightdirectspeech_templates()
 		'title' => 'highlightdirectspeech_showthread_js_auto',
 		'template' => $db->escape_string('
 		<style>
-			span.highlight-speach {
+			span.directspeech {
 				{$css}
 			}
 		</style>
