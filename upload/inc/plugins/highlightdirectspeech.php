@@ -223,7 +223,7 @@ function highlightdirectspeech_templates()
 		'template' => $db->escape_string('<tr><td class="trow1"><label for="tagInput">HTML-Tag für wörtliche Rede:</label></td>
 	<td class="trow1">
 <input id="tagInput" type="text" style="width:300px;" placeholder="<b> oder z.B. <span style=\'color:red;\'>">
-<button type="button" id="convert">Wörtliche Rede formatieren</button></td></tr>'),
+<button type="button" id="convert">Wörtliche Rede formatieren</button>{$jscript}</td></tr>'),
 		'version' => 1,
 		'sid' => -2,
 		'dateline' => TIME_NOW
