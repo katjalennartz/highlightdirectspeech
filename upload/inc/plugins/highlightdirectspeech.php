@@ -1,8 +1,9 @@
 <?php
 
 /**
- * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.6"
- */
+ * Der Code und die Idee (vor allem das Javascript) basiert auf Amaryllions 'Highlight Direct Speech'
+ * https://www.mybb.de/erweiterungen/18x/plugins-themenanzeige/highlight-direct-speech/
+ **/ 
 
 if (!defined("IN_MYBB")) {
 	die("This file cannot be accessed directly.");
