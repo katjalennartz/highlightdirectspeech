@@ -235,7 +235,7 @@ function highlightdirectspeech_templates()
 		<legend><strong>Wörtliche Rede in Posts</strong></legend>
 		<table cellspacing="0" cellpadding="{$theme[\\\'tablespace\\\']}">
 		<tr>
-		<td colspan="2"><span class="smalltext"><strong>Möchtest du wörtliche Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</strong></span></td>
+		<td colspan="2"><span class="smalltext">Möchtest du wörtliche Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</span></td>
 		</tr>
 			<tr>
 			<td colspan="2">
