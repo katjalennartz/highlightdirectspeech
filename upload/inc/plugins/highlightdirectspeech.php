@@ -180,7 +180,6 @@ function highlightdirectspeech_templates()
 		<script type="text/javascript">
 	$(document).ready(function() {
 		$(".highlightbutton").click(function(e) {
-		console.log("Highlight button clicked");
 				e.preventDefault();
 				highlightDirectSpeechInPosts();
 		});
@@ -212,7 +211,7 @@ function highlightdirectspeech_templates()
 
 	$template[] = array(
 		'title' => 'highlightdirectspeech_showthread_button',
-		'template' => $db->escape_string('<a class="highlightbutton bl-btn bl-btn--showthread" href=""><span class="highlightcaption">Highlight "abc"</span></a>'),
+		'template' => $db->escape_string('<button class="highlightbutton bl-btn bl-btn--showthread"><span class="highlightcaption">Highlight "abc"</span></button>'),
 		'version' => 1,
 		'sid' => -2,
 		'dateline' => TIME_NOW
