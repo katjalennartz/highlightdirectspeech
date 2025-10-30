@@ -1,33 +1,72 @@
 function highlightDirectSpeechInPosts() {
-  //button holen
   const $caption = $('.highlightcaption').first();
-  const currentState = $caption.data('state'); // "on" oder "off"
+  const isOn = $caption.data('state') === 'on';
+  const $posts = $('.post_body');
 
-  if (currentState === 'on') {
-    $caption.data('state', 'off');
-    $caption.text('highlight "abc"');
-    $('.post_body').find('span.highlight-speach').contents().unwrap();
-  }
-  else {
-    $caption.data('state', 'on');
-    $caption.text('highlight "abc" OFF');
+  $caption.data('state', isOn ? 'off' : 'on');
+  $caption.text(isOn ? 'highlight "abc"' : 'highlight "abc" OFF');
 
-    const quoteRegex = /(„[^“]+“|“[^”]+”|"[^"]+"|«[^»]+»)/g;
+  // Alte Hervorhebungen entfernen
+  $posts.find('span.directspeech').contents().unwrap();
+  if (isOn) return;
 
-    $('.post_body').each(function () {
-      //spans entfernen
-      $(this).find('span.highlight-speach').contents().unwrap();
+  const quoteRegex = /(„[^“]+“|“[^”]+”|"[^"]+"|«[^»]+»)/g;
 
-      let body_str = $(this).html();
-      body_str = body_str.replace(quoteRegex, '<span class="highlight-speach">$1</span>');
+  // Klassen, die ignoriert werden sollen
+  const excludeClasses = [
+    'editreason',
+    'moderator_notice'
+  ];
 
-      // korrektur html tags
-      body_str = body_str.replace(
-        /(<span class="highlight-speach">)([^<>]*)(<[^>]+>+)([^<>]*)(<\/span>)/g,
-        '$1$2</span>$3<span class="highlight-speach">$4$5'
-      );
+  // ID-Präfixe, die ignoriert werden sollen
+  const excludeIdPrefixes = [
+    'notemoderator_post_'
+  ];
 
-      $(this).html(body_str);
+  $posts.each(function () {
+    const walker = document.createTreeWalker(this, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      let parent = node.parentNode;
+      let skip = false;
+
+      while (parent && parent !== this) {
+        if (parent.nodeType === 1) { // ELEMENT_NODE
+          // Klassen prüfen
+          for (const cls of excludeClasses) {
+            if (parent.classList && parent.classList.contains(cls)) {
+              skip = true;
+              break;
+            }
+          }
+
+          // IDs prüfen
+          for (const prefix of excludeIdPrefixes) {
+            if (parent.id && parent.id.startsWith(prefix)) {
+              skip = true;
+              break;
+            }
+          }
+        }
+
+        if (skip) break;
+        parent = parent.parentNode;
+      }
+
+      if (!skip) textNodes.push(node);
+    }
+
+    textNodes.forEach(node => {
+      const text = node.nodeValue;
+      if (!quoteRegex.test(text)) return;
+      quoteRegex.lastIndex = 0;
+
+      const replaced = text.replace(quoteRegex, '<span class="directspeech">$1</span>');
+      const temp = document.createElement('span');
+      temp.innerHTML = replaced;
+      node.replaceWith(...temp.childNodes);
     });
-  }
+  });
 }
