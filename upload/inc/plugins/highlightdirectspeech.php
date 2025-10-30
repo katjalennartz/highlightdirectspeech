@@ -320,6 +320,9 @@ function show_highlightdirectspeech()
 				$fidflag = true;
 			}
 		}
+		if ($fids == "-1") {
+			$fidflag = true;
+		}
 		if ($fidflag) {
 			//einstellungen des Users holen
 			if ($mybb->user['directspeach'] == 1) {
@@ -354,6 +357,9 @@ function highlightdirectspeech_post()
 		if (strpos("," . $parentlist . ",", "," . trim($id) . ",") !== false) {
 			$fidflag = true;
 		}
+	}
+	if ($fids == "-1") {
+		$fidflag = true;
 	}
 	if ($fidflag && $mybb->settings['highlightdirectspeech_modus'] == "newthread") {
 		$jscript = "<script>
@@ -439,6 +445,8 @@ function highlightdirectspeech_getCharacters()
 {
     global $db, $mybb;
     $thisuser = (int) $mybb->user['uid'];
+	if ($db->field_exists("as_uid", "users")) {
+
     $as_uid = (int)($mybb->user['as_uid'] ?? 0);
     $all = array();
     if ($as_uid == 0) {
@@ -456,7 +464,10 @@ function highlightdirectspeech_getCharacters()
     while ($uid = $db->fetch_array($get_all_uids)) {
         array_push($all, $uid['uid']);
     }
-
     $all_ids = implode(',', $all);
+	} else {
+		$all_ids = $thisuser;
+	}
+
     return $all_ids;
 }
