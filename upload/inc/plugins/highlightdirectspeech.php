@@ -1,9 +1,8 @@
 <?php
 
 /**
- * Der Code und die Idee (vor allem das Javascript) basiert auf Amaryllions 'Highlight Direct Speech'
- * https://www.mybb.de/erweiterungen/18x/plugins-themenanzeige/highlight-direct-speech/
- **/ 
+ * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.6"
+ */
 
 if (!defined("IN_MYBB")) {
 	die("This file cannot be accessed directly.");
@@ -181,6 +180,7 @@ function highlightdirectspeech_templates()
 		<script type="text/javascript">
 	$(document).ready(function() {
 		$(".highlightbutton").click(function(e) {
+		console.log("Highlight button clicked");
 				e.preventDefault();
 				highlightDirectSpeechInPosts();
 		});
@@ -198,7 +198,7 @@ function highlightdirectspeech_templates()
 			span.highlight-speach {
 				{$css}
 			}
-		</script>
+		</style>
 		<script type="text/javascript" src="{$mybb->asset_url}/jscripts/highlightdirectspeech/highlightdirectspeech.js"></script>
 	<script type="text/javascript">
 			$(document).ready(function() {
@@ -313,31 +313,27 @@ function show_highlightdirectspeech()
 		$css = $mybb->settings['highlightdirectspeech_css'];
 		$parentlist = get_parent_list($fid);
 		//Im Ingame ja / nein? ^
-		if (strpos($fids, ",") === false) {
-			//nicht im ingame, tu nichts.
-		} else {
-			$fidarray = explode(",", $fids);
+		$fidarray = explode(",", $fids);
 
-			foreach ($fidarray as $id) {
-				if (strpos("," . $parentlist . ",", "," . trim($id) . ",") !== false) {
-					$fidflag = true;
-				}
+		foreach ($fidarray as $id) {
+			if (strpos("," . $parentlist . ",", "," . trim($id) . ",") !== false) {
+				$fidflag = true;
 			}
-			if ($fidflag) {
-				//einstellungen des Users holen
-				if ($mybb->user['directspeach'] == 1) {
-					//immer anzeigen
-					eval("\$showthread_highlightdirectspeech_js_auto = \"" . $templates->get("highlightdirectspeech_showthread_js_auto") . "\";");
-				} else if ($mybb->user['directspeach'] == 2) {
-					//button anzeigen
-					eval("\$highlightdirectspeech_js = \"" . $templates->get("showthread_highlightdirectspeech_js") . "\";");
-					eval("\$highlightdirectspeech_button = \"" . $templates->get("highlightdirectspeech_showthread_button") . "\";");
-				} else {
-					//gar nicht
-					$highlightdirectspeech_js_auto = "";
-					$highlightdirectspeech_js = "";
-					$highlightdirectspeech_button = "";
-				}
+		}
+		if ($fidflag) {
+			//einstellungen des Users holen
+			if ($mybb->user['directspeach'] == 1) {
+				//immer anzeigen
+				eval("\$showthread_highlightdirectspeech_js_auto = \"" . $templates->get("highlightdirectspeech_showthread_js_auto") . "\";");
+			} else if ($mybb->user['directspeach'] == 2) {
+				//button anzeigen
+				eval("\$highlightdirectspeech_js = \"" . $templates->get("highlightdirectspeech_showthread_js") . "\";");
+				eval("\$highlightdirectspeech_button = \"" . $templates->get("highlightdirectspeech_showthread_button") . "\";");
+			} else {
+				//gar nicht
+				$highlightdirectspeech_js_auto = "";
+				$highlightdirectspeech_js = "";
+				$highlightdirectspeech_button = "";
 			}
 		}
 	}
@@ -403,7 +399,6 @@ function highlightdirectspeech_edit_profile()
 	$highlightdirectspeech_ucp = "";
 
 	if ($mybb->settings['highlightdirectspeech_modus'] == "showthread") {
-		echo "hallo";
 		$check = $db->fetch_field($db->simple_select("users", "directspeach", "uid = " . $mybb->user['uid'] . ""), "directspeach");
 
 		if ($check == 1) {
