@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.8
+ * The idea of this plugin is based on the highlight direct speech Plugin of Amaryllion for MyBB 1.6"
  */
 
 if (!defined("IN_MYBB")) {
@@ -10,6 +10,7 @@ if (!defined("IN_MYBB")) {
 
 //error_reporting ( -1 );
 //ini_set ( 'display_errors', true ); 
+
 
 function highlightdirectspeech_info()
 {
@@ -51,7 +52,7 @@ function highlightdirectspeech_add_settings($type = "install")
 		$setting_group = array(
 			'name' => 'highlightdirectspeech',
 			'title' => 'Wörtliche Rede hervorheben',
-			'description' => 'Einstellungen für das Hervorheben von wörtlicher Rede in Posts',
+			'description' => 'Einstellungen für das Hervorheben von wörtliche Rede in Posts',
 			'disporder' => 6, // The order your setting group will display
 			'isdefault' => 0
 		);
@@ -113,24 +114,21 @@ function highlightdirectspeech_settingarray()
 		'title' => 'Hervorhebungsmodus',
 		'description' => 'Soll das Hervorheben in der Showthread (nur über JS) erfolgen, je nach Einstellung des Users oder soll es beim Erstellen des Posts/Threads direkt in die Textarea eingefügt werden?',
 		'optionscode' => "radio\nshowthread=Showthread\nnewthread=Beim Erstellen",
-		'value' => 'showthread',
-		'disporder' => 0
+		'value' => 'showthread'
 	);
 
 	$settingarray['highlightdirectspeech_foren'] = array(
 		'title' => 'Berücksichtige Foren',
-		'description' => 'Wähle die Foren aus, in denen die Hervorhebung der wörtlichen Rede aktiviert sein soll.',
+		'description' => 'Wähle die Foren aus, in denen die Hervorhebung der direkten Rede aktiviert sein soll.',
 		'optionscode' => 'forumselect',
-		'value' => '0', // Default,
-		'disporder' => 2
+		'value' => '0', // Default
 	);
 
 	$settingarray['highlightdirectspeech_css'] = array(
 		'title' => 'CSS für Hervorhebung',
 		'description' => 'Gib hier das CSS an, welches für die Hervorhebung der wörtlichen Rede verwendet werden soll. Standard ist "font-weight: 900;"',
 		'optionscode' => 'textarea',
-		'value' => 'font-weight: 900;',
-		'disporder' => 3
+		'value' => 'font-weight: 900;'
 	);
 
 	return $settingarray;
@@ -221,7 +219,7 @@ function highlightdirectspeech_templates()
 		'template' => $db->escape_string('<tr><td class="trow1"><label for="tagInput">HTML-Tag für wörtliche Rede:</label></td>
 	<td class="trow1">
 <input id="tagInput" type="text" style="width:300px;" placeholder="<b> oder z.B. <span style=\'color:red;\'>">
-<button type="button" id="convert">Wörtliche Rede formatieren</button></td></tr>'),
+<button type="button" id="convert">Wörtliche Rede formatieren</button>{$jscript}</td></tr>'),
 		'version' => 1,
 		'sid' => -2,
 		'dateline' => TIME_NOW
@@ -261,12 +259,12 @@ function highlightdirectspeech_uninstall()
 	if ($db->field_exists("directspeach", "users")) {
 		$db->write_query("ALTER TABLE " . TABLE_PREFIX . "users DROP directspeach");
 	}
-	// Einstellungen entfernen
-	$db->delete_query("settings", "name LIKE 'highlightdirectspeech%'");
-	$db->delete_query('settinggroups', "name = 'highlightdirectspeech'");
+
+	//remove variables
+	include MYBB_ROOT . "/inc/adminfunctions_templates.php";
+
 
 	$db->delete_query('templates', "title like 'highlightdirectspeech%'");
-	$db->delete_query("templategroups", "prefix = 'highlightdirectspeech'");
 }
 
 function highlightdirectspeech_activate()
