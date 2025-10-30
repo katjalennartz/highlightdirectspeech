@@ -8,8 +8,8 @@ if (!defined("IN_MYBB")) {
 	die("This file cannot be accessed directly.");
 }
 
-//error_reporting ( -1 );
-//ini_set ( 'display_errors', true ); 
+// error_reporting(E_ALL);
+// echo ini_get('display_errors');
 
 
 function highlightdirectspeech_info()
@@ -180,6 +180,7 @@ function highlightdirectspeech_templates()
 		<script type="text/javascript">
 	$(document).ready(function() {
 		$(".highlightbutton").click(function(e) {
+		console.log("Highlight button clicked");
 				e.preventDefault();
 				highlightDirectSpeechInPosts();
 		});
@@ -211,7 +212,7 @@ function highlightdirectspeech_templates()
 
 	$template[] = array(
 		'title' => 'highlightdirectspeech_showthread_button',
-		'template' => $db->escape_string('<button class="highlightbutton bl-btn bl-btn--showthread"><span class="highlightcaption">Highlight "abc"</span></button>'),
+		'template' => $db->escape_string('<a class="highlightbutton bl-btn bl-btn--showthread" href=""><span class="highlightcaption">Highlight "abc"</span></a>'),
 		'version' => 1,
 		'sid' => -2,
 		'dateline' => TIME_NOW
@@ -235,7 +236,7 @@ function highlightdirectspeech_templates()
 		<legend><strong>Wörtliche Rede in Posts</strong></legend>
 		<table cellspacing="0" cellpadding="{$theme[\\\'tablespace\\\']}">
 		<tr>
-		<td colspan="2"><span class="smalltext">Möchtest du wörtliche Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</span></td>
+		<td colspan="2"><span class="smalltext"><strong>Möchtest du wörtliche Rede in Posts fett hervorheben? Du kannst auswählen, ob dies automatisch geschehen soll, bei Klick auf einen Button, oder gar nicht.</strong></span></td>
 		</tr>
 			<tr>
 			<td colspan="2">
@@ -424,7 +425,38 @@ function highlightdirectspeech_edit_profile_do()
 	$highlightdirectspeech_check =  $mybb->get_input('directspeach', MYBB::INPUT_INT);
 
 	//FUNCTION FROM Character ALERT used
-	$uid = getCharacters();
+	$uid = highlightdirectspeech_getCharacters();
 
 	$db->query("UPDATE " . TABLE_PREFIX . "users SET directspeach =" . $highlightdirectspeech_check . " WHERE uid IN (" . $uid . ")");
+}
+
+
+/**
+ * Get the shared Accounts from Accountswitcher
+ * @return string all_uids 
+ */
+function highlightdirectspeech_getCharacters()
+{
+    global $db, $mybb;
+    $thisuser = (int) $mybb->user['uid'];
+    $as_uid = (int)($mybb->user['as_uid'] ?? 0);
+    $all = array();
+    if ($as_uid == 0) {
+        $hauptchar = $thisuser;
+        $get_all_uids = $db->query("SELECT uid FROM " . TABLE_PREFIX . "users WHERE 
+			 		   ((as_uid=$thisuser) OR (uid=$thisuser)) ORDER BY username");
+    } else if ($as_uid != 0) { //nicht mit Hauptaccoung online
+        //id des users holen wo alle angehangen sind + alle charas
+        $hauptchar = $as_uid;
+        $get_all_uids = $db->query("SELECT uid FROM " . TABLE_PREFIX . "users WHERE 
+					  ((as_uid=$as_uid) OR (uid=$thisuser) OR (uid=$as_uid)) 
+			 		  ORDER BY username");
+    }
+
+    while ($uid = $db->fetch_array($get_all_uids)) {
+        array_push($all, $uid['uid']);
+    }
+
+    $all_ids = implode(',', $all);
+    return $all_ids;
 }
